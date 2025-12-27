@@ -1,0 +1,37 @@
+
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+*/
+/**
+ * Analyser class for live audio visualisation.
+ */
+export class Analyser {
+  private analyser: AnalyserNode;
+  private bufferLength = 0;
+  private dataArray: Uint8Array;
+  private timeDataArray: Uint8Array;
+
+  constructor(node: AudioNode) {
+    this.analyser = node.context.createAnalyser();
+    // Increased fftSize for better waveform resolution
+    this.analyser.fftSize = 512;
+    this.bufferLength = this.analyser.frequencyBinCount;
+    this.dataArray = new Uint8Array(this.bufferLength);
+    this.timeDataArray = new Uint8Array(this.analyser.fftSize);
+    node.connect(this.analyser);
+  }
+
+  update() {
+    this.analyser.getByteFrequencyData(this.dataArray);
+    this.analyser.getByteTimeDomainData(this.timeDataArray);
+  }
+
+  get data() {
+    return this.dataArray;
+  }
+
+  get timeData() {
+    return this.timeDataArray;
+  }
+}
